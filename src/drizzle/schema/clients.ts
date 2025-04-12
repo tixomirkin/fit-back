@@ -18,3 +18,7 @@ export const clientsRelations = relations(clientsTable, ({ one }) => ({
         references: [projectsTable.id]
     })
 }))
+
+// export enum clientTableColumn {
+//
+// }

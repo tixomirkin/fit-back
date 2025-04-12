@@ -1,11 +1,23 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Request, ParseIntPipe} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Request, ParseIntPipe, Query} from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import {ApiBearerAuth, ApiCreatedResponse, ApiHeader, ApiOperation, ApiParam, ApiTags} from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags
+} from "@nestjs/swagger";
 import {ProjectPermissions} from "../../permissions/permissions.decorator";
 import {Permission} from "../../permissions/permission-enum";
 import RequestWithAccess from "../../permissions/requestWithAccess.interfce";
+import {clientsTable} from "../../drizzle/schema";
+import {GetClientsOptionDto} from "./dto/get-clients-option.dto";
+import {ApiOkResponsePaginated} from "../../common/utils/pagination.utils";
+import {PublicClientDto} from "./dto/public-client.dto";
 
 @ApiTags("Clients - Клиенты")
 @ApiBearerAuth()
@@ -15,6 +27,7 @@ export class ClientsController {
 
   @Post()
   @ProjectPermissions(Permission.ADD_CLIENTS)
+  // @ApiResponse({ status: 200, description: 'Successful response', type: GetPublicClientsDto })
   @ApiOperation({ summary: 'Создание клиента в проекте' })
   @ApiParam({name: 'project_id', required: true, description: 'id проекта'})
   create(@Body() createClientDto: CreateClientDto, @Request() request: RequestWithAccess) {
@@ -23,10 +36,14 @@ export class ClientsController {
 
   @Get()
   @ApiOperation({ summary: 'Получение списка клиентов в проекте' })
+  @ApiOkResponsePaginated(PublicClientDto)
   @ApiParam({name: 'project_id', required: true, description: 'id проекта'})
   @ProjectPermissions(Permission.VIEW_CLIENTS)
-  findAll(@Request() request: RequestWithAccess) {
-    return this.clientsService.findAll(request);
+  findAll(
+      @Query() pageOptionsDto: GetClientsOptionDto,
+      @Request() request: RequestWithAccess
+  ) {
+    return this.clientsService.findAll(request, pageOptionsDto);
   }
 
   @Get(':id')

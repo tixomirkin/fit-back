@@ -32,7 +32,7 @@ export class ScheduleService {
   findAll(startDate: Date, endDate: Date, request: RequestWithAccess) {
     // const endDay = new Date(day.getTime());
     // day.setHours(0, 0, 0, 0)
-    // endDay.setHours(23, 59, 59, 59)
+    endDate.setHours(23, 59, 59, 59)
     return this.db.query.scheduleTable.findMany({
       where: between(scheduleTable.startDate, startDate, endDate)
     });

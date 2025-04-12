@@ -6,7 +6,10 @@ import {DrizzleAsyncProvider} from "../../drizzle/drizzle.provider";
 import * as schema from "../../drizzle/schema";
 import RequestWithAccess from "../../permissions/requestWithAccess.interfce";
 import {clientsTable, trainersTable} from "../../drizzle/schema";
-import {and, eq} from "drizzle-orm";
+import {and, count, eq, sql} from "drizzle-orm";
+import { desc, asc } from 'drizzle-orm';
+import {queryWithPagination} from "../../drizzle/utils";
+import {PageOptionsDto} from "../../common/utils/page-options.dto";
 
 @Injectable()
 export class ClientsService {
@@ -21,11 +24,13 @@ export class ClientsService {
     }).returning()
   }
 
-  findAll(request: RequestWithAccess) {
+  findAll(request: RequestWithAccess, pageOptionsDto: PageOptionsDto) {
     const {project} = request
-    return this.db.query.clientsTable.findMany({
-      where: eq(clientsTable.projectId, project.id)
-    })
+    // const query = this.db.query.clientsTable.findMany({
+    //   where: eq(clientsTable.projectId, project.id),
+    // })
+    const query = this.db.select().from(clientsTable).where(eq(clientsTable.projectId, project.id)).$dynamic()
+    return queryWithPagination(query, pageOptionsDto, clientsTable)
   }
 
   async findOne(id: number, request: RequestWithAccess) {

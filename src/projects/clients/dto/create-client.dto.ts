@@ -26,10 +26,10 @@ export class CreateClientDto {
     @ApiProperty({
         description: 'Внутринняя заметка по клиенту',
         default: "Лох какой-то",
-        minLength: 3,
+        minLength: 0,
         maxLength: 255
     })
-    @Length(3, 255)
+    @Length(0, 255)
     @IsString()
     @IsOptional()
     description?: string;
